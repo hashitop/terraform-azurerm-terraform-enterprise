@@ -136,7 +136,19 @@ locals {
     }
 
     extra_no_proxy = {
-      value = ""
+      value = join(
+        ",",
+        concat(
+          [
+            "127.0.0.1",
+            "169.254.169.254",
+            ".azure.com",
+            ".windows.net",
+            ".microsoft.com",
+          ],
+          var.no_proxy
+        )
+      )
     }
 
     iact_subnet_list = {
