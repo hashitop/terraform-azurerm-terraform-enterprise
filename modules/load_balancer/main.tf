@@ -354,7 +354,7 @@ resource "azurerm_lb_probe" "tfe_load_balancer_probe_console" {
 
   loadbalancer_id = azurerm_lb.tfe_load_balancer[0].id
   protocol        = "Https"
-  request_path    = "/authenticate"
+  request_path    = "/ping"
   port            = 8800
 }
 
