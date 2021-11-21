@@ -171,5 +171,5 @@ variable "proxy_port" {
 variable "no_proxy" {
   default     = []
   type        = list(string)
-  description = "Addresses which should not be accessed through the proxy server located at proxy_ip. This list will be combined with internal GCP addresses."
+  description = "Addresses which should not be accessed through the proxy server located at proxy_ip. This list will be combined with internal Azure addresses."
 }
