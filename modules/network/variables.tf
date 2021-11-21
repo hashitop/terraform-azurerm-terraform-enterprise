@@ -74,6 +74,18 @@ variable "network_allow_range" {
   description = "(Optional) Network range to allow access to TFE"
 }
 
+variable "private_link_enforced" {
+  default     = false
+  type        = bool
+  description = "(Optional) Enforce private link policies"
+}
+
+variable "database_flexible_server" {
+  type = bool
+  default = true
+  description = "Type of Postgres database resource, `azurerm_postgresql_flexible_server` or `azurerm_postgresql_server`"
+}
+
 # Load balancer
 # -------------
 variable "load_balancer_type" {

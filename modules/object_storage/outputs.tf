@@ -1,3 +1,8 @@
+output "storage_account_id" {
+  value       = var.storage_account_name == null ? element(azurerm_storage_account.tfe_storage_account.*.id,0) : null
+  description = "The ID of the storage account used by TFE"
+}
+
 output "storage_account_name" {
   value       = local.storage_account_name
   description = "The name of the storage account used by TFE"

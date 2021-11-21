@@ -19,6 +19,8 @@ resource "azurerm_subnet" "tfe_network_private_subnet" {
   address_prefixes     = [var.network_private_subnet_cidr]
   virtual_network_name = azurerm_virtual_network.tfe_network.name
 
+  enforce_private_link_endpoint_network_policies = var.private_link_enforced
+
   service_endpoints = [
     "Microsoft.Sql",
     "Microsoft.Storage",
@@ -252,14 +254,14 @@ resource "azurerm_subnet" "tfe_network_redis_subnet" {
 # Database private DNS zone and subnet
 # -----------------
 resource "azurerm_private_dns_zone" "database" {
-  count = var.demo_mode == true ? 0 : 1
+  count = var.demo_mode == true ? 0 : var.database_flexible_server ? 1 :0
 
   name                = "${var.friendly_name_prefix}.postgres.database.azure.com"
   resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "database" {
-  count = var.demo_mode == true ? 0 : 1
+  count = var.demo_mode == true ? 0 : var.database_flexible_server ? 1 : 0
 
   name                  = "${var.friendly_name_prefix}-database"
   private_dns_zone_name = azurerm_private_dns_zone.database[0].name
@@ -268,7 +270,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "database" {
 }
 
 resource "azurerm_subnet" "database" {
-  count = var.demo_mode == true ? 0 : 1
+  count = var.demo_mode == true ? 0 : var.database_flexible_server ? 1 : 0
 
   name                 = "${var.friendly_name_prefix}-database-subnet"
   resource_group_name  = var.resource_group_name

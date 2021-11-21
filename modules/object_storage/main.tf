@@ -29,6 +29,14 @@ resource "azurerm_storage_account" "tfe_storage_account" {
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_account_replication_type
 
+  allow_blob_public_access = var.allow_blob_public_access
+
+  network_rules {
+    default_action = var.network_rules_default_action
+    ip_rules       = var.default_action_ip_rules
+    virtual_network_subnet_ids = var.default_action_subnet_ids
+  }
+  
   tags = var.tags
 }
 

@@ -107,6 +107,12 @@ module "object_storage" {
   storage_account_tier                           = var.storage_account_tier
   storage_account_replication_type               = var.storage_account_replication_type
 
+  # Application storage network rules
+  allow_blob_public_access = var.allow_blob_public_access
+  network_rules_default_action = var.network_rules_default_action
+  default_action_ip_rules = var.default_action_ip_rules
+  default_action_subnet_ids = var.allow_blob_public_access == false && var.network_rules_default_action == "Deny" ? concat([module.network[0].private_subnet.id], var.default_action_subnet_ids) : []
+
   tags = var.tags
 }
 
@@ -129,6 +135,8 @@ module "network" {
   network_frontend_subnet_cidr = var.network_frontend_subnet_cidr
   network_private_subnet_cidr  = var.network_private_subnet_cidr
   network_redis_subnet_cidr    = var.network_redis_subnet_cidr
+  private_link_enforced        = var.private_link_enforced
+  database_flexible_server     = var.database_flexible_server
 
   create_bastion = var.create_bastion
   demo_mode      = local.demo_mode
@@ -137,6 +145,31 @@ module "network" {
   load_balancer_public = var.load_balancer_public
 
   tags = var.tags
+}
+
+# Azure private endpoints
+# -------------------------------------------------------------
+module "private_endpoints" {
+  source = "./modules/private_endpoints"
+
+  private_link_enforced = var.private_link_enforced
+  friendly_name_prefix = var.friendly_name_prefix
+
+  location = var.location
+  resource_group_name = module.resource_groups.resource_group_name
+
+  virtual_network_id  = module.network[0].network.id
+  application_subnet_id = module.network[0].private_subnet.id
+
+  # Application storage
+  storage_account_id           = var.private_link_enforced ? module.object_storage[0].storage_account_id : null
+  # Database name
+  postgres_server_id           = var.private_link_enforced ? module.database[0].server.id : null
+
+  depends_on = [
+    module.object_storage,
+    module.database
+  ]
 }
 
 # Azure cache
@@ -169,6 +202,7 @@ module "database" {
   count  = local.demo_mode == true ? 0 : 1
 
   friendly_name_prefix = var.friendly_name_prefix
+  flexible_server = var.database_flexible_server
   resource_group_name  = module.resource_groups.resource_group_name
   location             = var.location
 
@@ -195,7 +229,7 @@ module "user_data" {
   user_data_pg_dbname   = local.database.name
   user_data_pg_netloc   = local.database.address
   user_data_pg_user     = local.database.server.administrator_login
-  user_data_pg_password = local.database.server.administrator_password
+  user_data_pg_password = var.database_flexible_server ? local.database.server.administrator_password : local.database.server.administrator_login_password
 
   # Redis
   user_data_redis_host        = local.active_active == true ? module.redis[0].redis_hostname : null

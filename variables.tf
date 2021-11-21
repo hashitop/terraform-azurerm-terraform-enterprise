@@ -145,6 +145,12 @@ variable "network_allow_range" {
   description = "(Optional) Network range to allow access to TFE"
 }
 
+variable "private_link_enforced" {
+  default     = false
+  type        = bool
+  description = "(Optional) Enforce private link policies"
+}
+
 # TFE License
 # -----------
 variable "tfe_license_secret" {
@@ -179,6 +185,36 @@ variable "storage_account_primary_blob_connection_string" {
   type        = string
   description = "Storage account primary blob endpoint"
 }
+
+
+variable "allow_blob_public_access" {
+  default = false
+  type = bool
+  description = "'Allow public access to the Storage account"
+}
+
+variable "network_rules_default_action" {
+  type = string
+  description = "Storage account default access rule, which can be 'Allow' or 'Deny'"
+
+  validation {
+    condition = contains(["Allow","Deny"], var.network_rules_default_action)  
+    error_message = "Storage account default access rule, which can be 'Allow' or 'Deny'."
+  }
+}
+
+variable "default_action_ip_rules" {
+  default = []
+  type = list(string)
+  description = "The IP rules for the Storage account default action"
+}
+
+variable "default_action_subnet_ids" {
+  default = []
+  type = list(string)
+  description = "The Subnet Ids for the Storage account default action"
+}
+
 
 # Service Accounts
 # ----------------
@@ -219,6 +255,13 @@ variable "database_version" {
   type        = number
   description = "Postgres version"
 }
+
+variable "database_flexible_server" {
+  type = bool
+  default = true
+  description = "Type of Postgres database resource, `azurerm_postgresql_flexible_server` or `azurerm_postgresql_server`"
+}
+
 
 # Load Balancer
 # -------------
