@@ -185,6 +185,7 @@ for more details.
 | <a name="input_database_size_mb"></a> [database\_size\_mb](#input\_database\_size\_mb) | Postgres storage size in MB | `number` | `32768` | no |
 | <a name="input_database_user"></a> [database\_user](#input\_database\_user) | Postgres username | `string` | `"tfeuser"` | no |
 | <a name="input_database_version"></a> [database\_version](#input\_database\_version) | Postgres version | `number` | `12` | no |
+| <a name="input_dedicated_subnets"></a> [dedicated\_subnets](#input\_dedicated\_subnets) | (Optional) Share subnet with application or having dedicated subnets for the storage and database | `bool` | `false` | no |
 | <a name="input_default_action_ip_rules"></a> [default\_action\_ip\_rules](#input\_default\_action\_ip\_rules) | The IP rules for the Storage account default action | `list(string)` | `[]` | no |
 | <a name="input_default_action_subnet_ids"></a> [default\_action\_subnet\_ids](#input\_default\_action\_subnet\_ids) | The Subnet Ids for the Storage account default action | `list(string)` | `[]` | no |
 | <a name="input_dns_create_record"></a> [dns\_create\_record](#input\_dns\_create\_record) | If true, will create a DNS record. If false, no record will be created and IP of load balancer will instead be output. | `bool` | `true` | no |
@@ -215,6 +216,8 @@ for more details.
 | <a name="input_network_redis_subnet_cidr"></a> [network\_redis\_subnet\_cidr](#input\_network\_redis\_subnet\_cidr) | (Optional) Subnet CIDR range for Redis | `string` | `"10.0.48.0/20"` | no |
 | <a name="input_network_redis_subnet_id"></a> [network\_redis\_subnet\_id](#input\_network\_redis\_subnet\_id) | (Optional) Existing network Redis subnet ID | `string` | `null` | no |
 | <a name="input_network_rules_default_action"></a> [network\_rules\_default\_action](#input\_network\_rules\_default\_action) | Storage account default access rule, which can be 'Allow' or 'Deny' | `string` | n/a | yes |
+| <a name="input_network_storage_subnet_cidr"></a> [network\_storage\_subnet\_cidr](#input\_network\_storage\_subnet\_cidr) | The CIDR range of the storage subnetwork. | `string` | `"10.0.80.0/20"` | no |
+| <a name="input_network_storage_subnet_id"></a> [network\_storage\_subnet\_id](#input\_network\_storage\_subnet\_id) | The identity of an existing storage account subnetwork. | `string` | `null` | no |
 | <a name="input_private_link_enforced"></a> [private\_link\_enforced](#input\_private\_link\_enforced) | (Optional) Enforce private link policies | `bool` | `false` | no |
 | <a name="input_proxy_ip"></a> [proxy\_ip](#input\_proxy\_ip) | IP Address of the proxy server | `string` | `null` | no |
 | <a name="input_proxy_port"></a> [proxy\_port](#input\_proxy\_port) | Port that the proxy server will use | `string` | `null` | no |

@@ -67,6 +67,12 @@ variable "create_bastion" {
 
 # Network
 # -------
+variable "dedicated_subnets" {
+  type = bool
+  default = false
+  description = "(Optional) Share subnet with application or having dedicated subnets for the storage and database"
+}
+
 variable "network_private_subnet_id" {
   default     = null
   type        = string
@@ -103,6 +109,12 @@ variable "network_database_private_dns_zone_id" {
   description = "The identity of an existing private DNS zone for the database."
 }
 
+variable "network_storage_subnet_id" {
+  default     = null
+  type        = string
+  description = "The identity of an existing storage account subnetwork."
+}
+
 variable "network_cidr" {
   default     = "10.0.0.0/16"
   type        = string
@@ -137,6 +149,12 @@ variable "network_database_subnet_cidr" {
   default     = "10.0.64.0/20"
   type        = string
   description = "The CIDR range of the database subnetwork."
+}
+
+variable "network_storage_subnet_cidr" {
+  default     = "10.0.80.0/20"
+  type        = string
+  description = "The CIDR range of the storage subnetwork."
 }
 
 variable "network_allow_range" {

@@ -21,6 +21,9 @@ locals {
       database_subnet = {
         id = var.network_database_subnet_id
       }
+      storage_subnet = {
+        id = var.network_storage_subnet_id
+      }
       frontend_subnet = {
         id = var.network_frontend_subnet_id
       }
@@ -132,11 +135,14 @@ module "network" {
   network_bastion_subnet_cidr  = var.network_bastion_subnet_cidr
   network_cidr                 = var.network_cidr
   network_database_subnet_cidr = var.network_database_subnet_cidr
+  network_storage_subnet_cidr  = var.network_storage_subnet_cidr
   network_frontend_subnet_cidr = var.network_frontend_subnet_cidr
   network_private_subnet_cidr  = var.network_private_subnet_cidr
   network_redis_subnet_cidr    = var.network_redis_subnet_cidr
+  
   private_link_enforced        = var.private_link_enforced
   database_flexible_server     = var.database_flexible_server
+  dedicated_subnets            = var.dedicated_subnets
 
   create_bastion = var.create_bastion
   demo_mode      = local.demo_mode
@@ -152,8 +158,10 @@ module "network" {
 module "private_endpoints" {
   source = "./modules/private_endpoints"
 
-  private_link_enforced = var.private_link_enforced
   friendly_name_prefix = var.friendly_name_prefix
+
+  private_link_enforced = var.private_link_enforced
+  dedicated_subnets            = var.dedicated_subnets
 
   location = var.location
   resource_group_name = module.resource_groups.resource_group_name
@@ -165,6 +173,12 @@ module "private_endpoints" {
   storage_account_id           = var.private_link_enforced ? module.object_storage[0].storage_account_id : null
   # Database name
   postgres_server_id           = var.private_link_enforced ? module.database[0].server.id : null
+
+  database_subnet_id           = local.network.database_subnet.id
+
+  storage_subnet_id            = local.network.storage_subnet.id
+
+  database_flexible_server     = var.database_flexible_server
 
   depends_on = [
     module.object_storage,
@@ -207,7 +221,7 @@ module "database" {
   location             = var.location
 
   database_machine_type        = var.database_machine_type
-  database_private_dns_zone_id = local.network.database_private_dns_zone.id
+  database_private_dns_zone_id = var.database_flexible_server ? local.network.database_private_dns_zone.id : null
   database_size_mb             = var.database_size_mb
   database_subnet_id           = local.network.database_subnet.id
   database_user                = var.database_user

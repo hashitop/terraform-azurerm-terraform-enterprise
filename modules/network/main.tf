@@ -269,23 +269,29 @@ resource "azurerm_private_dns_zone_virtual_network_link" "database" {
   virtual_network_id    = azurerm_virtual_network.tfe_network.id
 }
 
+
 resource "azurerm_subnet" "database" {
-  count = var.demo_mode == true ? 0 : var.database_flexible_server ? 1 : 0
+  count = var.demo_mode == true ? 0 : var.database_flexible_server || (var.private_link_enforced && var.dedicated_subnets) ? 1 : 0
 
   name                 = "${var.friendly_name_prefix}-database-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.tfe_network.name
 
   address_prefixes  = [var.network_database_subnet_cidr]
-  service_endpoints = ["Microsoft.Storage"]
+  service_endpoints = ["Microsoft.Sql"]
 
-  delegation {
-    name = "flexibleServers"
+  enforce_private_link_endpoint_network_policies = var.private_link_enforced
 
-    service_delegation {
-      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+  dynamic "delegation" {
+    for_each =  var.database_flexible_server ? [1] :[]
+    content {
+      name = "flexibleServers"
 
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+      service_delegation {
+        name = "Microsoft.DBforPostgreSQL/flexibleServers"
+
+        actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+      }
     }
   }
 
@@ -293,3 +299,28 @@ resource "azurerm_subnet" "database" {
     azurerm_private_dns_zone_virtual_network_link.database
   ]
 }
+
+
+resource "azurerm_subnet" "storage" {
+  count = var.demo_mode == true ? 0 : var.private_link_enforced && var.dedicated_subnets ? 1 : 0
+
+  name                 = "${var.friendly_name_prefix}-storage-subnet"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.tfe_network.name
+
+  address_prefixes  = [var.network_storage_subnet_cidr]
+  service_endpoints = ["Microsoft.Storage"]
+
+  enforce_private_link_endpoint_network_policies = var.private_link_enforced
+
+  # delegation {
+  #   name = "storageAccounts"
+
+  #   service_delegation {
+  #     name = "Microsoft.Storage/storageAccounts"
+
+  #     actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+  #   }
+  # }
+}
+

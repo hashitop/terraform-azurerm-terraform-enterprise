@@ -5,7 +5,7 @@ resource "azurerm_private_dns_zone" "storage_account" {
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
-  count = var.private_link_enforced ? 1 : 0
+  count = var.private_link_enforced && !var.database_flexible_server ? 1 : 0
   name                = "privatelink.postgres.database.azure.com"
   resource_group_name = var.resource_group_name
 }
@@ -19,7 +19,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "storage_account" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "postgres" {
-  count = var.private_link_enforced ? 1 : 0
+  count = var.private_link_enforced && !var.database_flexible_server ? 1 : 0
   name                  = "${var.friendly_name_prefix}dnsvnlinkpg"
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = element(azurerm_private_dns_zone.postgres.*.name,0)
@@ -31,7 +31,7 @@ resource "azurerm_private_endpoint" "storage_account" {
   name                = "${var.friendly_name_prefix}-ep-sa"
   resource_group_name = var.resource_group_name
   location            = var.location
-  subnet_id           = var.application_subnet_id
+  subnet_id           = var.dedicated_subnets ? var.storage_subnet_id : var.application_subnet_id
   
   private_dns_zone_group {
     name                 = "${var.friendly_name_prefix}-dns-zone-sa"
@@ -47,11 +47,11 @@ resource "azurerm_private_endpoint" "storage_account" {
 }
 
 resource "azurerm_private_endpoint" "postgres" {
-  count = var.private_link_enforced ? 1 : 0
+  count = var.private_link_enforced && !var.database_flexible_server ? 1 : 0
   name                = "${var.friendly_name_prefix}-ep-pg"
   resource_group_name = var.resource_group_name
   location            = var.location
-  subnet_id           = var.application_subnet_id
+  subnet_id           = var.dedicated_subnets ? var.database_subnet_id : var.application_subnet_id
   
   private_dns_zone_group {
     name                 = "${var.friendly_name_prefix}-dns-zone-pg"

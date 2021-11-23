@@ -45,3 +45,25 @@ variable "private_link_enforced" {
   type        = bool
   description = "(Optional) Enforce private link policies"
 }
+
+variable "dedicated_subnets" {
+  type = bool
+  default = false
+  description = "(Optional) Share subnet with application or having dedicated subnets for the storage and database"
+}
+
+variable "database_subnet_id" {
+  type        = string
+  description = "Azure Application database subnet Id which will be used when the `dedicated_subnets` is enforced"
+}
+
+variable "storage_subnet_id" {
+  type        = string
+  description = "Azure Application storage subnet Id which will be used when the `dedicated_subnets` is enforced"
+
+}
+
+variable "database_flexible_server" {
+  type = bool
+  description = "Type of Postgres database resource, `azurerm_postgresql_flexible_server` or `azurerm_postgresql_server`, choosing different resource type will result in different resources dependency"
+}

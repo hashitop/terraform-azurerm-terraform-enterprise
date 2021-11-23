@@ -29,6 +29,12 @@ output "database_subnet" {
   description = "The subnetwork dedicated to the database."
 }
 
+output "storage_subnet" {
+  value = try(azurerm_subnet.storage[0], null)
+
+  description = "The subnetwork dedicated to the storage."
+}
+
 output "database_private_dns_zone" {
   value = try(azurerm_private_dns_zone.database[0], null)
 

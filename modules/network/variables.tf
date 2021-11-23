@@ -68,6 +68,11 @@ variable "network_database_subnet_cidr" {
   description = "The CIDR range of the database subnetwork."
 }
 
+variable "network_storage_subnet_cidr" {
+  type        = string
+  description = "The CIDR range of the storage subnetwork."
+}
+
 variable "network_allow_range" {
   default     = "*"
   type        = string
@@ -83,7 +88,13 @@ variable "private_link_enforced" {
 variable "database_flexible_server" {
   type = bool
   default = true
-  description = "Type of Postgres database resource, `azurerm_postgresql_flexible_server` or `azurerm_postgresql_server`"
+  description = "(Optional) Type of Postgres database resource, `azurerm_postgresql_flexible_server` (default) or `azurerm_postgresql_server`"
+}
+
+variable "dedicated_subnets" {
+  type = bool
+  default = false
+  description = "(Optional) Share subnet with application or having dedicated subnets for the storage and database when using private link"
 }
 
 # Load balancer
